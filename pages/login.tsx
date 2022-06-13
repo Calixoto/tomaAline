@@ -13,13 +13,6 @@ const Login: NextPage = () => {
     event.preventDefault();
     try {
       const data = await fauna.query(q.Get(q.Collection('user_empreendedor')));
-      const r = await fauna.query(
-        q.Match(q.Indexes([q.Index('password'), q.Index('email')]), {
-          name,
-          password,
-        })
-      );
-      console.log(r);
       setDados(data);
       return data;
     } catch {
