@@ -1,29 +1,35 @@
-import { query as q } from 'faunadb';
 import { NextPage } from 'next';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { fauna } from '../services/fauna';
+import { useCallback, useContext, useState } from 'react';
+import { userContext } from '../context/userContext';
+
+type Props = {
+  email: string;
+  name: string;
+  password: string;
+};
 
 const Login: NextPage = () => {
-  const [name, setName] = useState('');
+  const { localStorage } = useContext(userContext);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [dados, setDados] = useState<any>();
+  const [dados, setDados] = useState<Props>();
+  const result = localStorage?.getItem('user1');
 
   const login = useCallback(async (event: any) => {
     event.preventDefault();
-    try {
-      const data = await fauna.query(q.Get(q.Collection('user_empreendedor')));
-      setDados(data);
-      return data;
-    } catch {
-      return false;
+    result ? setDados(JSON.parse(result)) : null;
+    if (dados?.email === email && dados?.password === password) {
+      console.log('Login realizado com sucesso');
+    } else {
+      console.log('tente denovoS');
     }
   }, []);
 
-  useEffect(() => {
-    document.title = 'Login';
-    console.log(dados);
-  }, [dados]);
+  // useEffect(() => {
+  //   document.title = 'Login';
+  //   console.log(dados);
+  // }, [dados]);
 
   return (
     <div className='container'>
@@ -34,11 +40,23 @@ const Login: NextPage = () => {
           <form onSubmit={login}>
             <div className='form_group'>
               <label htmlFor='mail'>Email</label>
-              <input type='text' id='mail' name='user' />
+              <input
+                type='text'
+                id='mail'
+                name='user'
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
             </div>
             <div className='form_group'>
               <label htmlFor='pass'>Senha</label>
-              <input type='password' id='pass' name='pass' />
+              <input
+                type='password'
+                id='pass'
+                name='pass'
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
             </div>
             <div>
               <Link href='/'>Cancelar</Link>
