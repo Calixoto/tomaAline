@@ -1,8 +1,8 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { userContext } from '../context/userContext';
-import { api } from '../services/api';
 
 interface CheckboxProps {
   languages: {
@@ -16,9 +16,7 @@ const Cadastro: NextPage = () => {
   useEffect(() => {
     document.title = 'Cadastro';
   }, []);
-  // const [name, setName] = useState('');
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
+  const route = useRouter();
   const [isChecked, setIsChecked] = useState<CheckboxProps>({
     languages: {
       react: false,
@@ -35,13 +33,22 @@ const Cadastro: NextPage = () => {
     setEmail,
     setPassword,
     localStorage,
+    userId,
+    setUserId,
   } = useContext(userContext);
 
   const subscribe = useCallback(
     (event: any) => {
-      api.get('').then(res => {});
+      // api.get('').then(res => {});
       event.preventDefault();
-      localStorage?.setItem('user1', JSON.stringify({ name, email, password }));
+      localStorage?.setItem(
+        `${userId}`,
+        JSON.stringify({ name, email, password })
+      );
+      setUserId(state => {
+        return state + 1;
+      });
+      route.push('/login');
     },
     [email, name, password]
   );
@@ -115,6 +122,7 @@ const Cadastro: NextPage = () => {
               name='user'
               value={name}
               onChange={e => setName(e.target.value)}
+              required
             />
           </div>
           <div className='form_group'>
@@ -125,6 +133,7 @@ const Cadastro: NextPage = () => {
               name='email'
               value={email}
               onChange={e => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className='form_group'>
@@ -135,6 +144,7 @@ const Cadastro: NextPage = () => {
               name='password'
               value={password}
               onChange={e => setPassword(e.target.value)}
+              required
             />
           </div>
           <div>

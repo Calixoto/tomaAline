@@ -1,5 +1,7 @@
 import type { NextPage } from 'next';
-import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
+import { userContext } from '../context/userContext';
 
 interface IBadgeStatus {
   children: React.ReactNode;
@@ -12,6 +14,12 @@ interface IProjetoType {
   tmp_desenvolvimento: string;
 }
 
+type Props = {
+  email: string;
+  name: string;
+  password: string;
+};
+
 export function BadgeStatus({ isActive, children }: IBadgeStatus) {
   return (
     <span className={isActive ? 'badge_ativo' : 'badge_inativo'}>
@@ -21,12 +29,33 @@ export function BadgeStatus({ isActive, children }: IBadgeStatus) {
 }
 
 const Projetos: NextPage = () => {
+  const { localStorage, setIsLogged, userLogged } = useContext(userContext);
+  const [user, setUser] = useState<Props | null>(null);
+  const route = useRouter();
+
+  useEffect(() => {
+    if (localStorage) {
+      const userOn = localStorage.getItem(`${userLogged}`);
+      const dados = JSON.parse(userOn || '');
+      setUser(dados);
+      console.log(user);
+    }
+  }, [userLogged]);
+
   useEffect(() => {
     document.title = 'Projetos';
   }, []);
 
-  const localStorage =
-    typeof window !== 'undefined' ? window.localStorage : null;
+  function handleLogout() {
+    if (localStorage) {
+      localStorage.removeItem('UserIsLogged');
+      setIsLogged(false);
+      route.push('/');
+    }
+  }
+
+  // const localStorage =
+  //   typeof window !== 'undefined' ? window.localStorage : null;
   const projetos: IProjetoType[] = [
     {
       nome: 'Projeto Electik',
@@ -55,7 +84,8 @@ const Projetos: NextPage = () => {
   ];
   return (
     <div className='container'>
-      <h1 style={{ marginBottom: '16px;' }}>Bem vindo</h1>
+      <button onClick={handleLogout}>Sair</button>
+      <h1 style={{ marginBottom: '16px;' }}>Bem vindo {user?.name}</h1>
 
       <div className='wrap_page'>
         {projetos.map(projeto => (

@@ -1,5 +1,6 @@
 import { NextPage } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useCallback, useContext, useState } from 'react';
 import { userContext } from '../context/userContext';
 
@@ -10,26 +11,34 @@ type Props = {
 };
 
 const Login: NextPage = () => {
-  const { localStorage } = useContext(userContext);
+  const route = useRouter();
+  const { localStorage, setIsLogged } = useContext(userContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [dados, setDados] = useState<Props>();
-  const result = localStorage?.getItem('user1');
-
-  const login = useCallback(async (event: any) => {
-    event.preventDefault();
-    result ? setDados(JSON.parse(result)) : null;
-    if (dados?.email === email && dados?.password === password) {
-      console.log('Login realizado com sucesso');
-    } else {
-      console.log('tente denovoS');
-    }
-  }, []);
-
-  // useEffect(() => {
-  //   document.title = 'Login';
-  //   console.log(dados);
-  // }, [dados]);
+  const login = useCallback(
+    (event: any) => {
+      let dados: Props | null = null;
+      let isUser = false;
+      event.preventDefault();
+      if (localStorage) {
+        for (let i = 0; i < localStorage.length; i++) {
+          const result = localStorage.getItem(`${i}`);
+          dados = result ? JSON.parse(result) : null;
+          if (dados?.email === email && dados?.password === password) {
+            isUser = true;
+            localStorage.setItem('UserIsLogged', JSON.stringify(i));
+            setIsLogged(true);
+            route.push('/projetos');
+            break;
+          }
+        }
+        !isUser
+          ? alert('Usuário ou senha incorretos, tente novamente!!')
+          : null;
+      }
+    },
+    [email, password]
+  );
 
   return (
     <div className='container'>
