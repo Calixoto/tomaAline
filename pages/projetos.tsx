@@ -89,7 +89,7 @@ const Projetos: NextPage = () => {
 
       <div className='wrap_page'>
         {projetos.map(projeto => (
-          <div className='card_project'>
+          <div className='card_project' key={projeto.nome}>
             <BadgeStatus isActive={projeto.ativo}>
               {projeto.ativo ? 'Ativo' : 'inativo'}
             </BadgeStatus>
